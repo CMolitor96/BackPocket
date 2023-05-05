@@ -1,11 +1,12 @@
 function rssFeedData() {
   let feedObject = [];
+  let mp3Map = new Map();
     return fetch("https://anchor.fm/s/3bc06940/podcast/rss")
     .then(response => response.text())
     .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
     .then(data => {
       const items = data.querySelectorAll("item");
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 2; i++) {
         let obj = {};
         obj.title = items[i].querySelector("title").innerHTML.slice(9,-3);
         obj.author = items[i].childNodes[9].innerHTML.slice(9, -3);
@@ -17,6 +18,8 @@ function rssFeedData() {
         let duration = items[i].childNodes[19].innerHTML.split(":");
         let seconds = (+duration[0]) * 60 * 60 + (+duration[1]) * 60 + (+duration[2]);
         obj.durationSeconds = seconds;
+        mp3Map.set(`${i}`, items[i].querySelector("enclosure").getAttribute("url"))
+        obj.map = mp3Map;
         feedObject.push(obj);
       }    
       return feedObject;
@@ -54,6 +57,22 @@ function updateCurrentTime(audio, num) {
   })
 }
 
+function convertSecondsToHoursMinutes(seconds) {
+  var hours = Math.floor(seconds / 3600);
+  var minutes = Math.floor((seconds % 3600) / 60);
+  if (hours === 0) {
+    return minutes + " minutes";
+  } else if (minutes === 0) {
+    if (hours === 1) {
+      return hours + ' hour';
+    } else {
+      return hours + ' hours'
+    }
+  } else {
+    return hours + ' hours, ' + minutes + ' minutes';
+  }
+}
+
 function episodeAudio(rssFeed) {
   for (let i = 0; i < rssFeed.length; i++) {
     let audioDiv = document.createElement("div");
@@ -65,7 +84,7 @@ function episodeAudio(rssFeed) {
     seekBar.setAttribute("step", 1);
     seekBar.setAttribute("value", 0);
     audio.setAttribute("id", `episodeAudio${i}`);
-    audio.setAttribute("src", rssFeed[i].link);
+    audio.setAttribute("src", rssFeed[i].map.get(`${i}`));
     let timeElapsed = document.createElement("span");
     timeElapsed.setAttribute("id", `currentTime${i}`);
     timeElapsed.innerHTML = "0:00";
@@ -76,6 +95,53 @@ function episodeAudio(rssFeed) {
     let div = document.getElementById(`episodeCard${i}`);
     div.append(audioDiv);
   }
+}
+
+function episodeAudioBetter(rssFeed, num) {
+  //basically gonna import the rssFeed and grab that element in the array based on the num
+  // let desiredObject = rssFeed[num];
+  //now dynamically add all the stuff to episodeCard${i}, including the mp3 file based on the map key of num
+  // let episodeCard = document.querySelector(`episodeCard${num}`);
+  let audioDiv = document.createElement("div");
+  let audio = document.createElement("audio");
+  let seekBar = document.createElement("input");
+  seekBar.setAttribute("id", `seek${num}`);
+  seekBar.setAttribute("type", "range");
+  seekBar.setAttribute("min", 0);
+  seekBar.setAttribute("step", 1);
+  seekBar.setAttribute("value", 0);
+  audio.setAttribute("id", `episodeAudio${num}`);
+  audio.setAttribute("src", rssFeed.map.get(`${num}`));
+  let timeElapsed = document.createElement("span");
+  timeElapsed.setAttribute("id", `currentTime${num}`);
+  timeElapsed.innerHTML = "0:00";
+  let duration = document.createElement("span");
+  let seconds = formatTime(rssFeed.durationSeconds);
+  duration.innerHTML = seconds;
+  audioDiv.append(audio, timeElapsed, seekBar, duration);
+  let div = document.getElementById(`episodeCard${num}`);
+
+  let audioControlDiv = document.querySelector(`.audioControls${num}`);
+  let playButtonCurrent = document.querySelector(`.play${num}`);
+  let skipButton = document.createElement("button");
+  skipButton.setAttribute("id", `skip${num}`);
+  let skipImage = document.createElement("img");
+  let skipImageSrc = "./assets/images/skip.svg";
+  skipImage.setAttribute("src", skipImageSrc);
+  skipImage.setAttribute("id", `skip${num}`);
+  let rewindButton = document.createElement("button");
+  rewindButton.setAttribute("id", `rewind${num}`);
+  let rewindImage = document.createElement("img");
+  let rewindImageSrc = "./assets/images/rewind.svg";
+  rewindImage.setAttribute("src", rewindImageSrc);
+  rewindImage.setAttribute("id", `rewind${num}`);
+  skipButton.append(skipImage);
+  rewindButton.append(rewindImage);
+  audioControlDiv.insertBefore(skipButton, audioControlDiv.firstChild);
+  audioControlDiv.append(rewindButton);
+
+  div.append(audioDiv);
+  // episodeCard.append(audioDiv)
 }
 
 function individualEpisodeCard(rssFeed) {
@@ -92,24 +158,18 @@ function individualEpisodeCard(rssFeed) {
     pubDate.innerHTML = rssFeed[i].pubDate;
     let author = document.createElement("p");
     author.innerHTML = rssFeed[i].author;
-    // let link = document.createElement("p");
-    // link.innerHTML = rssFeed[i].link;
+    let duration = document.createElement("p");
+    duration.innerHTML = convertSecondsToHoursMinutes(rssFeed[i].durationSeconds);
+    let audioControls = document.createElement("div");
+    audioControls.setAttribute("class", `audioControls${i}`);
     let playButton = document.createElement("button");
     playButton.setAttribute("id", `play${i}`);
-    playButton.innerHTML = "Play";
-    let pauseButton = document.createElement("button");
-    pauseButton.setAttribute("id", `pause${i}`);
-    pauseButton.innerHTML = "Pause";
-    let skipButton = document.createElement("button");
-    skipButton.setAttribute("id", `skip${i}`);
-    skipButton.innerHTML = "Skip"
-    let rewindButton = document.createElement("button");
-    rewindButton.setAttribute("id", `rewind${i}`);
-    rewindButton.innerHTML = "Rewind";
-    article.append(title, description, pubDate, author, playButton, pauseButton, skipButton, rewindButton);
+    playButton.innerHTML = "⏵";
+    audioControls.append(playButton);
+    article.append(title, description, pubDate, author, duration, audioControls);
     page.append(article);
   }
-  episodeAudio(rssFeed);
+  // episodeAudio(rssFeed);
 }
 
 
@@ -121,27 +181,41 @@ function displayFeed() {
 }
 
 
-
+let playState = false;
 function playAudio(num) {
   let source = "episodeAudio" + num;
   let audioSourceNumber = document.getElementById(source);
   updateCurrentTime(audioSourceNumber, num);
-  audioSourceNumber.play();
+  let buttonSource = "play" + num;
+  let button = document.getElementById(buttonSource);
+  if (playState === false) {
+    button.innerHTML = "⏸";
+    // btn.className = 'pause'
+    audioSourceNumber.play();
+    playState = true;
+  } else {
+    button.innerHTML = "⏵";
+    // btn.className = 'play';
+    audioSourceNumber.pause();
+    playState = false;
+  // return false;
+  }
+  
 }
-function pauseAudio(num) {
-  let source = "episodeAudio" + num;
-  let audioSourceNumber = document.getElementById(source);
-  audioSourceNumber.pause();
-}
+// function pauseAudio(num) {
+//   let source = "episodeAudio" + num;
+//   let audioSourceNumber = document.getElementById(source);
+//   audioSourceNumber.pause();
+// }
 function skipAudio(num) {
   let source = "episodeAudio" + num;
   let audioSourceNumber = document.getElementById(source);
-  audioSourceNumber.currentTime += 15;
+  audioSourceNumber.currentTime += 10;
 }
 function rewindAudio(num) {
   let source = "episodeAudio" + num;
   let audioSourceNumber = document.getElementById(source);
-  audioSourceNumber.currentTime -= 15;
+  audioSourceNumber.currentTime -= 10;
 }
 function seekAudio(num) {
   let audioSource = "episodeAudio" + num;
@@ -160,7 +234,12 @@ function getSpecificAudio() {
       let id = e.target.id;
       let smallId = id.split("y");
       num = smallId[1];
-      playAudio(num);
+      rssFeedData().then(rssFeed => {
+        let object = rssFeed[num]
+        episodeAudioBetter(object,num)
+        playAudio(num);
+      })
+      // playAudio(num);
     } else if (e.target.id.includes('pause')) {
       let num;
       let id = e.target.id
@@ -194,3 +273,5 @@ function getSpecificAudio() {
 
 displayFeed();
 getSpecificAudio();
+
+

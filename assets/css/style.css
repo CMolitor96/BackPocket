@@ -8,3 +8,45 @@
     margin: 1rem;
 }
 
+
+
+/* #play0 was original css name that works for first episode */
+
+button[id^="play"] {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    background-color: lightblue;
+    border: none;
+    font-size: 2rem;
+    text-align: center;
+    color: black;
+    margin: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+
+button[id^="play"]:hover {
+    color: white;
+}
+
+button[id^="skip"] {
+    border: none;
+    height: 3rem;
+    width: 3rem;
+    background-color: white;
+    padding: 0rem;
+    margin: 1rem;
+}
+
+button[id^="rewind"] {
+    border: none;
+    height: 3rem;
+    width: 3rem;
+    background-color: white;
+    padding: 0rem;
+    margin: 1rem;
+}
+

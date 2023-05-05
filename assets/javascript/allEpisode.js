@@ -67,8 +67,8 @@ function rssFeedData() {
       audio.setAttribute("id", `episodeAudio${i}`);
       audio.setAttribute("src", rssFeed[i].link);
       // introduce native controls below
-      audio.setAttribute("controls", true);
-      audio.setAttribute("preload", "metadata");
+      // audio.setAttribute("controls", true);
+      // audio.setAttribute("preload", "metadata");
 
       let timeElapsed = document.createElement("span");
       timeElapsed.setAttribute("id", `currentTime${i}`);
@@ -76,7 +76,7 @@ function rssFeedData() {
       let duration = document.createElement("span");
       let seconds = formatTime(rssFeed[i].durationSeconds);
       duration.innerHTML = seconds;
-    //   audioDiv.append(audio, timeElapsed, seekBar, duration);
+      audioDiv.append(audio, timeElapsed, seekBar, duration);
       audioDiv.append(audio);
       let div = document.getElementById(`episodeCard${i}`);
       div.append(audioDiv);
@@ -97,22 +97,25 @@ function rssFeedData() {
       pubDate.innerHTML = rssFeed[i].pubDate;
       let author = document.createElement("p");
       author.innerHTML = rssFeed[i].author;
-      let link = document.createElement("p");
-      link.innerHTML = rssFeed[i].link;
+      // let link = document.createElement("p");
+      // link.innerHTML = rssFeed[i].link;
+      let audioControls = document.createElement("div");
+      audioControls.setAttribute("class", "audioControls");
       let playButton = document.createElement("button");
       playButton.setAttribute("id", `play${i}`);
-      playButton.innerHTML = "Play";
-      let pauseButton = document.createElement("button");
-      pauseButton.setAttribute("id", `pause${i}`);
-      pauseButton.innerHTML = "Pause";
+      playButton.innerHTML = "⏵";
+      // let pauseButton = document.createElement("button");
+      // pauseButton.setAttribute("id", `pause${i}`);
+      // pauseButton.innerHTML = "Pause";
       let skipButton = document.createElement("button");
       skipButton.setAttribute("id", `skip${i}`);
       skipButton.innerHTML = "Skip"
       let rewindButton = document.createElement("button");
       rewindButton.setAttribute("id", `rewind${i}`);
       rewindButton.innerHTML = "Rewind";
-    //   article.append(title, description, pubDate, author, link, playButton, pauseButton, skipButton, rewindButton);
-      article.append(title, description, pubDate, author);
+      audioControls.append(playButton, skipButton, rewindButton);
+      article.append(title, description, pubDate, author, audioControls);
+      // article.append(title, description, pubDate, author);
       page.append(article);
     }
     episodeAudio(rssFeed);
@@ -130,18 +133,31 @@ function rssFeedData() {
   }
   
   
-  
+  let playstate = false;
   function playAudio(num) {
     let source = "episodeAudio" + num;
     let audioSourceNumber = document.getElementById(source);
     updateCurrentTime(audioSourceNumber, num);
-    audioSourceNumber.play();
+    let buttonSource = "play" + num;
+    let button = document.getElementById(buttonSource);
+    if (playState === false) {
+      button.innerHTML = "⏸";
+      // btn.className = 'pause'
+      audioSourceNumber.play();
+      playState = true;
+    } else {
+      button.innerHTML = "⏵";
+      // btn.className = 'play';
+      audioSourceNumber.pause();
+      playState = false;
+    // return false;
+    }
   }
-  function pauseAudio(num) {
-    let source = "episodeAudio" + num;
-    let audioSourceNumber = document.getElementById(source);
-    audioSourceNumber.pause();
-  }
+  // function pauseAudio(num) {
+  //   let source = "episodeAudio" + num;
+  //   let audioSourceNumber = document.getElementById(source);
+  //   audioSourceNumber.pause();
+  // }
   function skipAudio(num) {
     let source = "episodeAudio" + num;
     let audioSourceNumber = document.getElementById(source);
