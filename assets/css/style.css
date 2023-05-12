@@ -12,6 +12,32 @@
 
 /* #play0 was original css name that works for first episode */
 
+input[id^="seek"] {
+    width: 65%;
+}
+
+div[class^="audioControls"] {
+    display: flex;
+    justify-content: center;
+}
+div[class^="timeControl"] {
+    display: flex;
+    justify-content: space-around;
+}
+
+button[id^="start"] {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    background-color: lightblue;
+    border: none;
+    font-size: 2rem;
+    text-align: center;
+    color: black;
+    margin: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
 button[id^="play"] {
     height: 3rem;
     width: 3rem;
