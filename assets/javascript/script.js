@@ -6,7 +6,7 @@ function rssFeedData() {
     .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
     .then(data => {
       const items = data.querySelectorAll("item");
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 1; i++) {
         let obj = {};
         obj.title = items[i].querySelector("title").innerHTML.slice(9,-3);
         obj.author = items[i].childNodes[9].innerHTML.slice(9, -3);
@@ -157,7 +157,7 @@ function individualEpisodeCard(rssFeed) {
     article.setAttribute("id", `episodeCard${i}`);
     let title = document.createElement("h1");
     title.innerHTML = rssFeed[i].title;
-    let description = document.createElement("p");
+    let description = document.createElement("section");
     description.innerHTML = rssFeed[i].description;
     let pubDate = document.createElement("p");
     pubDate.innerHTML = rssFeed[i].pubDate;

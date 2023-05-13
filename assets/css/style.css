@@ -4,13 +4,18 @@
     padding: 0px;
 }
 
-#backPocket {
-    margin: 1rem;
+#backPocketLogo {
+    width: 100%;
+    height: auto;
 }
 
+#backPocketLogoParent {
+    position: absolute;
+    left: 40%;
+    transform: translateX(-50%);
+    margin-left: 5rem;
+}
 
-
-/* #play0 was original css name that works for first episode */
 
 input[id^="seek"] {
     width: 65%;
@@ -48,10 +53,11 @@ button[id^="play"] {
     text-align: center;
     color: black;
     margin: 1rem;
-    font-family: 'Courier New', Courier, monospace;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
+    font-family:'Times New Roman', Times, serif;
+}
+
+button[id^="start"]:hover {
+    color: white;
 }
 
 button[id^="play"]:hover {
@@ -75,4 +81,17 @@ button[id^="rewind"] {
     padding: 0rem;
     margin: 1rem;
 }
+
+p {
+    margin: 1rem;
+}
+
+h1 {
+    margin: 1rem;
+}
+
+form {
+    margin: 1rem;
+}
+
 
