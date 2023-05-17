@@ -94,4 +94,9 @@ form {
     margin: 1rem;
 }
 
+section {
+    margin: 1rem;
+    word-break: break-word;
+}
+
 

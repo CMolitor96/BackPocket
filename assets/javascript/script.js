@@ -159,7 +159,10 @@ function individualEpisodeCard(rssFeed) {
     title.innerHTML = rssFeed[i].title;
     let description = document.createElement("section");
     description.innerHTML = rssFeed[i].description;
+    let authorDateDiv = document.createElement("div");
+    authorDateDiv.setAttribute("style", "display: flex; justify-content: space-between");
     let pubDate = document.createElement("p");
+    // pubDate.setAttribute("style", "text-align: end;")
     pubDate.innerHTML = rssFeed[i].pubDate;
     let author = document.createElement("p");
     author.innerHTML = rssFeed[i].author;
@@ -168,10 +171,15 @@ function individualEpisodeCard(rssFeed) {
     let audioControls = document.createElement("div");
     audioControls.setAttribute("class", `audioControls${i}`);
     let startButton = document.createElement("button");
+    // let imgStartButton = document.createElement("img");
+    // let imgStartButtonSrc = "./assets/images/playFill.svg";
+    // imgStartButton.setAttribute("src", imgStartButtonSrc)
+    // startButton.append(imgStartButton);
     startButton.innerHTML = "⏵";
     startButton.setAttribute("id", `start${i}`);
+    authorDateDiv.append(author, pubDate);
     // audioControls.append(startButton, playButton);
-    article.append(title, description, pubDate, author, duration, startButton, audioControls);
+    article.append(title, authorDateDiv, description, duration, startButton, audioControls);
     page.append(article);
   }
   // episodeAudio(rssFeed);

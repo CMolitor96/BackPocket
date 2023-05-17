@@ -11,7 +11,11 @@ function rssFeedData() {
         obj.title = items[i].querySelector("title").innerHTML.slice(9,-3);
         obj.author = items[i].childNodes[9].innerHTML.slice(9, -3);
         let description = items[i].querySelector("description").innerHTML.split('--');
-        obj.description = description[0].slice(9);
+        let xmlDescription = description[0].slice(9);
+        let pXmlDescription = xmlDescription.replaceAll("<p>", "");
+        let p2XmlDescription = pXmlDescription.replaceAll("</p>", "");
+        console.log(p2XmlDescription);
+        obj.description = p2XmlDescription;
         obj.link = items[i].querySelector("enclosure").getAttribute("url");
         let pubDate = new Date(items[i].querySelector("pubDate").innerHTML);
         obj.pubDate = pubDate.toLocaleDateString(); 
@@ -22,6 +26,10 @@ function rssFeedData() {
         obj.map = mp3Map;
         feedObject.push(obj);
       }    
+      // console.log(feedObject[2].description);
+      // let first = feedObject[2].description.replaceAll("<p>", "");
+      // let second = first.replaceAll("</p>", "");
+      // console.log(second);
       return feedObject;
     });
 }
