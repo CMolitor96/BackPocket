@@ -6,11 +6,12 @@ function sendEmail() {
         e.preventDefault();
         let subject = document.querySelector("#subject");
         let message = document.querySelector("#message");
-        console.log(subject.value, message.value)
-        // if (subject.value || message.value === "") {
-        //     let error = document.querySelector("#empty");
-        //     error.innerHTML = "Cannot leave field blank"
-        // }
+        // console.log(subject.value, message.value)
+        if (subject.value === "" || message.value === "") {
+            let error = document.querySelector("#empty");
+            error.innerHTML = `<h3 style="color: red; font-weight: bolder">Cannot leave fields blank</h3>`
+            return;
+        }
         window.open(`mailto:slipyourhandinmybackpocket@gmail.com?subject=${subject.value}&body=${message.value}`);
     })
 }

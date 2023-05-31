@@ -14,7 +14,6 @@ function rssFeedData() {
         let xmlDescription = description[0].slice(9);
         let pXmlDescription = xmlDescription.replaceAll("<p>", "");
         let p2XmlDescription = pXmlDescription.replaceAll("</p>", "");
-        console.log(p2XmlDescription);
         obj.description = p2XmlDescription;
         obj.link = items[i].querySelector("enclosure").getAttribute("url");
         let pubDate = new Date(items[i].querySelector("pubDate").innerHTML);
@@ -26,10 +25,6 @@ function rssFeedData() {
         obj.map = mp3Map;
         feedObject.push(obj);
       }    
-      // console.log(feedObject[2].description);
-      // let first = feedObject[2].description.replaceAll("<p>", "");
-      // let second = first.replaceAll("</p>", "");
-      // console.log(second);
       return feedObject;
     });
 }
@@ -81,29 +76,6 @@ function convertSecondsToHoursMinutes(seconds) {
   }
 }
 
-function episodeAudio(rssFeed) {
-  for (let i = 0; i < rssFeed.length; i++) {
-    let audioDiv = document.createElement("div");
-    let audio = document.createElement("audio");
-    let seekBar = document.createElement("input");
-    seekBar.setAttribute("id", `seek${i}`);
-    seekBar.setAttribute("type", "range");
-    seekBar.setAttribute("min", 0);
-    seekBar.setAttribute("step", 1);
-    seekBar.setAttribute("value", 0);
-    audio.setAttribute("id", `episodeAudio${i}`);
-    audio.setAttribute("src", rssFeed[i].map.get(`${i}`));
-    let timeElapsed = document.createElement("span");
-    timeElapsed.setAttribute("id", `currentTime${i}`);
-    timeElapsed.innerHTML = "0:00";
-    let duration = document.createElement("span");
-    let seconds = formatTime(rssFeed[i].durationSeconds);
-    duration.innerHTML = seconds;
-    audioDiv.append(audio, timeElapsed, seekBar, duration);
-    let div = document.getElementById(`episodeCard${i}`);
-    div.append(audioDiv);
-  }
-}
 
 function episodeAudioBetter(rssFeed, num) {
   //basically gonna import the rssFeed and grab that element in the array based on the num
@@ -159,30 +131,26 @@ function episodeAudioBetter(rssFeed, num) {
 
 function individualEpisodeCard(rssFeed) {
   let page = document.getElementById("rssFeed");
+  let html = ``;
   for (let i = 0; i < rssFeed.length; i++) {
-    let article = document.createElement("article");
-    article.setAttribute("style", "margin: 1rem; border: 2px solid black");
-    article.setAttribute("id", `episodeCard${i}`);
-    let title = document.createElement("h1");
-    title.innerHTML = rssFeed[i].title;
-    let description = document.createElement("section");
-    description.innerHTML = rssFeed[i].description;
-    let pubDate = document.createElement("p");
-    pubDate.innerHTML = rssFeed[i].pubDate;
-    let author = document.createElement("p");
-    author.innerHTML = rssFeed[i].author;
-    let duration = document.createElement("p");
-    duration.innerHTML = convertSecondsToHoursMinutes(rssFeed[i].durationSeconds);
-    let audioControls = document.createElement("div");
-    audioControls.setAttribute("class", `audioControls${i}`);
-    let startButton = document.createElement("button");
-    startButton.innerHTML = "⏵";
-    startButton.setAttribute("id", `start${i}`);
-    // audioControls.append(startButton, playButton);
-    article.append(title, description, pubDate, author, duration, startButton, audioControls);
-    page.append(article);
+    let durationNew = convertSecondsToHoursMinutes(rssFeed[i].durationSeconds);
+    html += `<article style="margin: 1rem; border: 2px solid black;" id=${`episodeCard${i}`}>
+<h1>${rssFeed[i].title}</h1>
+<div style="display: flex; justify-content: space-between; font-weight: 200;">
+  <p>${rssFeed[i].author}</p>
+  <p>${rssFeed[i].pubDate}</p>
+</div>
+<section>
+  ${rssFeed[i].description}
+</section>
+<div style="display: flex; justify-content: space-between; align-items: baseline;" id=${`startAudio${i}`}>
+  <button id=${`start${i}`}>⏵</button>
+  <p>${durationNew}</p>
+</div>
+<div class=${`audioControls${i}`}></div>
+</article>`;
   }
-  // episodeAudio(rssFeed);
+  page.innerHTML = html;
 }
 
 
@@ -247,8 +215,8 @@ function getSpecificAudio() {
       let id = e.target.id;
       let smallId = id.split("t");
       num = smallId[2];
-      let startButton = document.querySelector(`#start${num}`);
-      startButton.remove();
+      let startAudioDiv = document.querySelector(`#startAudio${num}`);
+      startAudioDiv.remove();
       rssFeedData().then(rssFeed => {
         let object = rssFeed[num]
         episodeAudioBetter(object,num)
