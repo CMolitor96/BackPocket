@@ -61,161 +61,75 @@ function updateCurrentTime(audio, num) {
 }
 
 function convertSecondsToHoursMinutes(seconds) {
-  var hours = Math.floor(seconds / 3600);
-  var minutes = Math.floor((seconds % 3600) / 60);
-  if (hours === 0) {
-    return minutes + " minutes";
-  } else if (minutes === 0) {
-    if (hours === 1) {
-      return hours + ' hour';
-    } else {
-      return hours + ' hours'
-    }
-  } else {
-    return hours + ' hours, ' + minutes + ' minutes';
-  }
-}
+  let h = Math.floor(seconds / 3600);
+  let m = Math.floor(seconds % 3600 / 60);
 
-// function episodeAudio(rssFeed) {
-//   for (let i = 0; i < rssFeed.length; i++) {
-//     let audioDiv = document.createElement("div");
-//     let audio = document.createElement("audio");
-//     let seekBar = document.createElement("input");
-//     seekBar.setAttribute("id", `seek${i}`);
-//     seekBar.setAttribute("type", "range");
-//     seekBar.setAttribute("min", 0);
-//     seekBar.setAttribute("step", 1);
-//     seekBar.setAttribute("value", 0);
-//     audio.setAttribute("id", `episodeAudio${i}`);
-//     audio.setAttribute("src", rssFeed[i].map.get(`${i}`));
-//     let timeElapsed = document.createElement("span");
-//     timeElapsed.setAttribute("id", `currentTime${i}`);
-//     timeElapsed.innerHTML = "0:00";
-//     let duration = document.createElement("span");
-//     let seconds = formatTime(rssFeed[i].durationSeconds);
-//     duration.innerHTML = seconds;
-//     audioDiv.append(audio, timeElapsed, seekBar, duration);
-//     let div = document.getElementById(`episodeCard${i}`);
-//     div.append(audioDiv);
-//   }
-// }
+  let hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours, ") : "";
+  let mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
+  return hDisplay + mDisplay; 
+}
 
 function episodeAudioBetter(rssFeed, num) {
   //basically gonna import the rssFeed and grab that element in the array based on the num
-  // let desiredObject = rssFeed[num];
   //now dynamically add all the stuff to episodeCard${i}, including the mp3 file based on the map key of num
-  // let episodeCard = document.querySelector(`episodeCard${num}`);
-  let audioDiv = document.createElement("div");
-  let audio = document.createElement("audio");
-  let timeDiv = document.createElement("div");
-  timeDiv.setAttribute("class", "timeControls")
-  let seekBar = document.createElement("input");
-  seekBar.setAttribute("id", `seek${num}`);
-  seekBar.setAttribute("type", "range");
-  seekBar.setAttribute("min", 0);
-  seekBar.setAttribute("step", 1);
-  seekBar.setAttribute("value", 0);
-  audio.setAttribute("id", `episodeAudio${num}`);
-  audio.setAttribute("src", rssFeed.map.get(`${num}`));
-  let timeElapsed = document.createElement("span");
-  timeElapsed.setAttribute("id", `currentTime${num}`);
-  timeElapsed.innerHTML = "0:00";
-  let duration = document.createElement("span");
+  let audioSrc = rssFeed.map.get(num);
   let seconds = formatTime(rssFeed.durationSeconds);
-  duration.innerHTML = seconds;
-  timeDiv.append(timeElapsed, seekBar, duration);
-  audioDiv.append(audio, timeDiv);
+
   let div = document.getElementById(`episodeCard${num}`);
+  let seekBarHTML = `
+  <div>
+    <audio id=${`episodeAudio${num}`} src=${audioSrc} ></audio>
+    <div class="timeControls">
+      <span id=${`currentTime${num}`}>0:00</span>
+      <input id=${`seek${num}`} type="range" min="0" step="1" value="0">
+      <span>${seconds}</span>
+    </div>
+  </div>`;
+
+  div.innerHTML += seekBarHTML;
 
   let audioControlDiv = document.querySelector(`.audioControls${num}`);
-  // let playButtonCurrent = document.querySelector(`.play${num}`);
-  let playButton = document.createElement("button");
-  playButton.setAttribute("id", `play${num}`);
-  playButton.innerHTML = "⏸";
-  let skipButton = document.createElement("button");
-  skipButton.setAttribute("id", `skip${num}`);
-  let skipImage = document.createElement("img");
-  let skipImageSrc = "./assets/images/skip.svg";
-  skipImage.setAttribute("src", skipImageSrc);
-  skipImage.setAttribute("id", `skip${num}`);
-  let rewindButton = document.createElement("button");
-  rewindButton.setAttribute("id", `rewind${num}`);
-  let rewindImage = document.createElement("img");
-  let rewindImageSrc = "./assets/images/rewind.svg";
-  rewindImage.setAttribute("src", rewindImageSrc);
-  rewindImage.setAttribute("id", `rewind${num}`);
-  skipButton.append(skipImage);
-  rewindButton.append(rewindImage);
-  audioControlDiv.append(rewindButton, playButton, skipButton);
 
-  div.append(audioDiv);
-  // episodeCard.append(audioDiv)
+  let audioHTML = `
+  <div class=${`audioControls${num}`}>
+    <button id=${`rewind${num}`}>
+      <img src="./assets/images/rewind.svg" id=${`rewind${num}`} >
+    </button>
+    <button id=${`play${num}`}>⏸</button>
+    <button id=${`skip${num}`}>
+      <img src="./assets/images/skip.svg" id=${`skip${num}`} >
+    </button>
+  </div>`;
+  
+  audioControlDiv.innerHTML = audioHTML;
+
 }
 
 function individualEpisodeCard(rssFeed) {
   let page = document.getElementById("rssFeed");
   let html = ``;
   for (let i = 0; i < rssFeed.length; i++) {
-    let article = document.createElement("article");
-    article.setAttribute("style", "margin: 1rem; border: 2px solid black");
-    article.setAttribute("id", `episodeCard${i}`);
-    let logo = document.createElement("img");
-    let logoSrc = "./assets/images/logo.png";
-    logo.setAttribute("src", logoSrc);
-    let title = document.createElement("h1");
-    title.innerHTML = rssFeed[i].title;
-    let description = document.createElement("section");
-    description.innerHTML = rssFeed[i].description;
-    let authorDateDiv = document.createElement("div");
-    authorDateDiv.setAttribute("style", "display: flex; justify-content: space-between; font-weight: 200;");
-    let pubDate = document.createElement("p");
-    // pubDate.setAttribute("style", "text-align: end;")
-    pubDate.innerHTML = rssFeed[i].pubDate;
-    let author = document.createElement("p");
-    author.innerHTML = rssFeed[i].author;
-    let duration = document.createElement("p");
-    duration.innerHTML = convertSecondsToHoursMinutes(rssFeed[i].durationSeconds);
-    let audioControls = document.createElement("div");
-    audioControls.setAttribute("class", `audioControls${i}`);
-    let startDiv = document.createElement("div");
-    startDiv.setAttribute("style", "display: flex; justify-content: space-between; align-items: baseline;");
-    startDiv.setAttribute("id", `startAudio${i}`);
-    let startButton = document.createElement("button");
-    // let imgStartButton = document.createElement("img");
-    // let imgStartButtonSrc = "./assets/images/playFill.svg";
-    // imgStartButton.setAttribute("src", imgStartButtonSrc)
-    // startButton.append(imgStartButton);
-    startButton.innerHTML = "⏵";
-    startButton.setAttribute("id", `start${i}`);
-    authorDateDiv.append(author, pubDate);
-    startDiv.append(startButton, duration);
-    // let titleDiv = document.createElement("div");
-    // titleDiv.setAttribute("style", "display: flex; flex-wrap: wrap")
-    // titleDiv.append(logo, title);
-    // audioControls.append(startButton, playButton);
-    article.append(title, authorDateDiv, description, startDiv, audioControls);
     let durationNew = convertSecondsToHoursMinutes(rssFeed[i].durationSeconds);
-    html += `<article style="margin: 1rem; border: 2px solid black;" id=${`episodeCard${i}`}>
-<h1>${rssFeed[i].title}</h1>
-<div style="display: flex; justify-content: space-between; font-weight: 200;">
-  <p>${rssFeed[i].author}</p>
-  <p>${rssFeed[i].pubDate}</p>
-</div>
-<section>
-  ${rssFeed[i].description}
-</section>
-<div style="display: flex; justify-content: space-between; align-items: baseline;" id=${`startAudio${i}`}>
-  <button id=${`start${i}`}>⏵</button>
-  <p>${durationNew}</p>
-</div>
-<div class=${`audioControls${i}`}></div>
-</article>`;
-
-    // page.append(article);
-    
+    html += `
+    <article style="margin: 1rem; border: 2px solid black;" id=${`episodeCard${i}`}>
+        <h1 class="col">${rssFeed[i].title}</h1>
+      <div style="display: flex; justify-content: space-between; font-weight: 200;">
+        <p>${rssFeed[i].author}</p>
+        <p>${rssFeed[i].pubDate}</p>
+      </div>
+      <section>
+        ${rssFeed[i].description}
+      </section>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;" id=${`startAudio${i}`}>
+        <button id=${`start${i}`}>
+          <img src="./assets/images/play.svg" id=${`start${i}`}>
+        </button>
+        <p>${durationNew}</p>
+      </div>
+      <div class=${`audioControls${i}`}></div>
+    </article>`;  
   }
   page.innerHTML = html;
-  // episodeAudio(rssFeed);
 }
 
 
@@ -236,23 +150,16 @@ function playAudio(num) {
   let button = document.getElementById(buttonSource);
   if (playState === false) {
     button.innerHTML = "⏸";
-    // btn.className = 'pause'
     audioSourceNumber.play();
     playState = true;
   } else {
     button.innerHTML = "⏵";
-    // btn.className = 'play';
     audioSourceNumber.pause();
     playState = false;
-  // return false;
   }
   
 }
-// function pauseAudio(num) {
-//   let source = "episodeAudio" + num;
-//   let audioSourceNumber = document.getElementById(source);
-//   audioSourceNumber.pause();
-// }
+
 function skipAudio(num) {
   let source = "episodeAudio" + num;
   let audioSourceNumber = document.getElementById(source);
@@ -293,11 +200,6 @@ function getSpecificAudio() {
       let id = e.target.id;
       let smallId = id.split("y");
       num = smallId[1];
-      // rssFeedData().then(rssFeed => {
-      //   let object = rssFeed[num]
-      //   episodeAudioBetter(object,num)
-      //   playAudio(num);
-      // })
       playAudio(num);
     } else if (e.target.id.includes('pause')) {
       let num;

@@ -31,10 +31,8 @@ div[class^="timeControl"] {
 }
 
 button[id^="start"] {
-    height: 3rem;
-    width: 3rem;
     border-radius: 50%;
-    background-color: lightblue;
+    background-color: #14a2b8;
     border: none;
     font-size: 2rem;
     text-align: center;
@@ -47,7 +45,7 @@ button[id^="play"] {
     height: 3rem;
     width: 3rem;
     border-radius: 50%;
-    background-color: lightblue;
+    background-color: #14a2b8;
     border: none;
     font-size: 2rem;
     text-align: center;
@@ -57,7 +55,7 @@ button[id^="play"] {
 }
 
 button[id^="start"]:hover {
-    color: white;
+    background-color: lightblue;
 }
 
 button[id^="play"]:hover {
